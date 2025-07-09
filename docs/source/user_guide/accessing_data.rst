@@ -86,7 +86,14 @@ variants:
 
    current_mA = cell.procedure['Procedure Name'].experiment('Experiment Name').get("Current [mA]")
 
-To retrieve more than one column, simply pass multiple column names to 
+To retrieve more than one column, simply pass multiple column names to
 :func:`~pyprobe.result.Result.get`.
 
+If a column name is misspelled, PyProBE will offer the closest match using fuzzy
+string matching. For example:
+
+.. code-block:: python
+
+   cell.procedure['Procedure Name'].get('Voltage (V)')
+   # ValueError: column 'Voltage (V)' not in data. Did you mean 'Voltage [V]'?
 .. footbibliography::

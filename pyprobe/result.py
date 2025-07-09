@@ -1,5 +1,6 @@
 """A module for the Result class."""
 
+import difflib
 import re
 from collections.abc import Callable
 from functools import wraps
@@ -347,8 +348,22 @@ class Result(BaseModel):
         Raises:
             ValueError: If no column names are provided.
             ValueError: If a column name is not in the data.
+            The error message suggests the closest matching column name.
         """
-        array = self.data_with_columns(*column_names).to_numpy()
+        try:
+            array = self.data_with_columns(*column_names).to_numpy()
+        except ValueError as exc:
+            suggestions: list[str] = []
+            for col in column_names:
+                if col not in self.column_list:
+                    match = difflib.get_close_matches(col, self.column_list, n=1)
+                    if match:
+                        suggestions.append(f"'{col}' -> '{match[0]}'")
+            if suggestions:
+                error_msg = f"{exc} Did you mean {', '.join(suggestions)}?"
+                logger.error(error_msg)
+                raise ValueError(error_msg) from None
+            raise
         if len(column_names) == 0:
             error_msg = "At least one column name must be provided."
             logger.error(error_msg)

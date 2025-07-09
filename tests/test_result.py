@@ -192,6 +192,12 @@ def test_get(Result_fixture):
     )
 
 
+def test_get_fuzzy(Result_fixture):
+    """Test fuzzy matching in the get method."""
+    with pytest.raises(ValueError, match=r"Did you mean 'Voltage \[V\]'?"):
+        Result_fixture.get("Voltage (V)")
+
+
 def test_get_only(Result_fixture):
     """Test the get_only method."""
     current = Result_fixture.get("Current [A]")
